@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width">
     <title>SVG Compatibility - by @ithicah</title>
     <style>
-        /* page style */
+/* page style */
         body {
             background-color:orange;
             padding:0;
@@ -15,6 +15,43 @@
         }
         a {
             color:#222222;
+        }
+        h1 {
+            font-size: 20px;
+            line-height: 22px;
+            text-align: center;
+            padding: 0;
+            margin: 0;
+        }
+        h2 {
+            font-size: 14px;
+            line-height: 16px;
+            margin: 10px 0 30px 0;
+            width: 100%;
+            border-bottom: 1px dotted black;
+            padding: 0 0 5px 0;
+            float: left;
+        }
+        .desc {
+            font-size: 12px;
+            color: #444444;
+        }
+        .success, .error {
+            width: 100%;
+            float: left;
+            padding: 10px 0;
+            border-bottom: 1px solid black;
+            margin-bottom: 10px;
+        }
+        .success {
+            color: #468847;
+            background-color: #DFF0D8;
+            border-color: #468847;
+        }
+        .error {
+            color: #B94A48;
+            background-color: #F2DEDE;
+            border-color: #B94A48;
         }
         .row {
             width:70%;
@@ -28,15 +65,16 @@
             font-size: 11px;
             margin: 20px 0;
         }
-        /* alt text for the css-logo, hides text using the *Kellum Method* http://www.zeldman.com/2012/03/01/replacing-the-9999px-hack-new-image-replacement/ */
+/* alt text for the css-logo, hides text using the *Kellum Method* http://www.zeldman.com/2012/03/01/replacing-the-9999px-hack-new-image-replacement/ */
         .logo-text {
             display: block;
             text-indent: 100%;
             white-space: nowrap;
             overflow: hidden;
         }
-        /* the css-logo, uses a background-image for the SVG and background-size = contain to resize it based on it's container */
+/* the css-logo, uses a background-image for the SVG and background-size = contain to resize it based on it's container */
         .css-logo {
+            clear:both;
             display:block;
             width:100%;
             height:224px;
@@ -49,53 +87,80 @@
             -o-background-size:contain;
             background-size:contain;
         }
-        /* any browser that does not support SVG will serve a PNG */
+/* any browser that does not support SVG will serve a PNG */
         .no-svg .css-logo {
             background-image:url('twitter.png');
         }
-        /* any browser that does not support background-size will have to remain a fixed width */
+/* any browser that does not support background-size will have to remain a fixed width */
         .no-backgroundsize .css-logo {
             width:955px;
         }
-        /* the object-logo */
-        .object-logo {
+/* the object-logo */
+        .object-logo, .embed-logo {
             width:100%;
-            height:224px;
+            max-height:224px;
         }
-        /* resize all <img> if the browser does not support SVG objects [probably Android] */
+/* resize all <img> if the browser does not support SVG objects [probably Android] */
         img {
             width:100%;
             max-width:955px;
             max-height:224px;
         }
     </style>
-    <!-- a customised version of modernizr to only include SVG and background-size checks -->
+<!-- a customised version of modernizr to only include SVG and background-size checks -->
     <script src="modernizr.custom.52260.js"></script>
-    <!-- ie8 and below do not support svg clipping, so use a bit jquery to hide the svg-object and clone the altHtml (png) after the object - otherwise the svg will display but with a white background -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<!-- ie8 and below do not support svg fully, so use a bit of jquery to hide the svg-object and clone the altHtml (png) after the object - otherwise the svg will display but with a white background -->
     <!--[if lt IE 9]>
-         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-         <script>
+        <script>
             $(document).ready(function() {
                 $('.object-logo').hide();
                 altImg = $('.object-logo').attr('altHtml');
                 $(altImg).insertAfter('.object-logo');
             });
-         </script>
+        </script>
     <![endif]-->
+    <script>
+        $(document).ready(function() {
+// Replaces the IMG src to use PNG rather than SVG if not supported. Also adds message at top of screen to report SVG compatability
+            if ($('html').hasClass('no-svg')) {
+                $('.img-logo').attr('src', 'twitter.png');
+                $('h1').html('<span class="error">SVGs are not fully supported! (using PNGs instead)</span>');
+            }
+            if ($('html').hasClass('no-backgroundsize')) {
+                $('h1 .error').append(" 'background-size' CSS property not supported!");
+            }
+        });
+    </script>
 </head>
 <body>
+    <h1><span class="success">SVGs are supported!</span></h1>
     <div class="row">
+        <h2>The CSS Method<span class="desc"> - largely compatible with modern browsers and easy to use. Easy fallback with <a href="http://modernizr.com" target="_blank">Modernizr</a>, however not particularly accessible or easy to control (height-wise) with responsive web design.</span></h2>
         <!-- the css method -->
         <div class="css-logo">
             <span class="logo-text">Twitter</span>
         </div>
     </div>
     <div class="row">
+        <h2>The Object Method<span class="desc"> - largely compatible with modern browsers and accessible. Easy fallback with alternate content. In some older browsers that support SVG (IE7/8) it displays a white background, so I've used <a href="http://jquery.com/" target="_blank">jQuery</a> to replace the object with a PNG.</span></h2>
         <!-- the object method -->
         <object class="object-logo" type="image/svg+xml" data="twitter.svgz" altHtml="<img src='twitter.png' alt='Twitter' />">
             <!-- includes an img if object is not supported -->
             <img src="twitter.png" alt="Twitter" />
         </object>
+    </div>
+    <div class="row">
+        <h2>The Embed Method<span class="desc"> - largely compatible with modern browsers. Browsers that support embed but not SVG just display an empty box.</span></h2>
+        <!-- the embed method -->
+        <embed class="embed-logo" src="twitter.svgz" type="image/svg+xml">
+            <noembed><!-- includes an img if embed is not supported --><img src="twitter.png" alt="Twitter" /></noembed>
+        </embed>
+    </div>
+    <div class="row">
+        <h2>The IMG Method<span class="desc"> - somewhat compatible with modern browsers, but weird problems with the image height have been noticed. Need to use <a href="http://modernizr.com" target="_blank">Modernizr</a> and some extra <a href="http://jquery.com/" target="_blank">jQuery</a> to change the img src to a PNG for browsers that do not support SVG.</span></h2>
+        <!-- the img method -->
+        <img class="img-logo" src="twitter.svgz" alt="Twitter" />
     </div>
     <div class="footer">
         <p>SVG Compatibility by @<a href="http://www.twitter.com/ithicah">ithicah</a><br />Available on <a href="https://github.com/ithicah/svg-compatibility">GitHub</a></p>
